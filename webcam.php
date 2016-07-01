@@ -1,15 +1,12 @@
 <!
 Meteo cam
-version 1.2
-29 giugno 2016
+version 1.3
+1 luglio 2016
 Giuseppe Augiero
 
 Changelog:
 
-- Add limit to viewed elements
-- Add to list only selected images
-- Add watermark
-- Resolve sort (ASC)
+-Add sort by time or by name
 !>
 <CENTER>METEO</CENTER> 
 <P>
@@ -21,6 +18,9 @@ $imgdir="./img/";
 # Viewed image
 $elementi=24;
 $suffisso="webcam";
+#Sort by time  or name 
+$sortbytime= FALSE;
+
 if ($handle = opendir($imgdir)) {
     while (false !== ($file = readdir($handle))) 
     { 
@@ -38,21 +38,22 @@ foreach ($fl as $t) {
     $tos[] = $t[1];
 }
 #sort per data di modifica
-array_multisort($tos, SORT_ASC, $fl);
+if ($sortbytime == TRUE ){
+  array_multisort($tos, SORT_ASC, $fl);
+  }else {
+ array_multisort($fl,SORT_ASC);
+}
 // Load the stamp and the photo to apply the watermark to
 $stamp = imagecreatefrompng('fanta.png');
 $im = imagecreatefromjpeg($imgdir.$fl[0][0]);
-
 // Set the margins for the stamp and get the height/width of the stamp image
 $marge_right = 10;
 $marge_bottom = 10;
 $sx = imagesx($stamp);
 $sy = imagesy($stamp);
-
 // Copy the stamp image onto our photo using the margin offsets and the photo 
 // width to calculate positioning of the stamp. 
 imagecopy($im, $stamp, imagesx($im) - $sx - $marge_right, imagesy($im) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
-
 // Output and free memory
 echo "<CENTER>";
 //header('Content-type: image/png');
@@ -63,12 +64,9 @@ imagepng($im);
 $imagedata = ob_get_contents();
 // Clear the output buffer
 ob_end_clean();
-
 print '<p><img src="data:image/png;base64,'.base64_encode($imagedata).'" /></p>';    
-
 imagedestroy($im);
 echo "</CENTER>";
-
 //echo '<CENTER><img src="'.$imgdir.$fl[0][0].'"></CENTER>';
 echo "<P>";
 $posizione=0;
@@ -94,5 +92,4 @@ for ($k = 0; $k <= $righe; $k++) {
   echo "</TR>";
  }
 echo "</table>";
-
 ?> 
